@@ -1,0 +1,17 @@
+.list-item-container {
+  background-color: white;
+}
+
+.drag-icon {
+  margin: auto;
+  cursor: move; /* fallback if grab cursor is unsupported */
+  cursor: grab;
+}
+
+.drag-icon:active {
+  cursor: grabbing;
+}
+
+.edit-icon {
+  cursor: pointer;
+}

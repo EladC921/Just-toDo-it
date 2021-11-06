@@ -1,0 +1,45 @@
+button {
+  background-color: #3af578;
+}
+
+input {
+  background-color: white;
+  line-height: 2;
+}
+
+.container {
+  margin: 50px 20%;
+  background-color: #242729;
+  border: 2px solid #e274f8;
+  border-radius: 12px;
+  height: 90vh;
+  display: grid;
+  grid-template-rows: 10% auto 10%;
+}
+
+.but-delete {
+  background-color: rgb(255, 0, 0);
+  width: 100%;
+}
+
+#search {
+  display: flex;
+  justify-content: center;
+}
+
+#search input,
+button {
+  margin: 5px;
+}
+
+#delete-task {
+  display: flex;
+  justify-content: center;
+}
+
+.list-container {
+  overflow: auto;
+}
+
+#but-clear-tasks {
+}
