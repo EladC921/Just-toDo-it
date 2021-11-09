@@ -11,14 +11,18 @@ const Add_Task = () => {
   const [textS, resetText] = useState();
   const [lastDragged, setLastDragged] = useState();
 
+  // text box handler using useState in order to get the users data at all times and to reset the textbox after insert
   const handleUserInput = (e) => {
     setData({
       id: tasks.length,
       txt: e.target.value,
     });
+    console.log(data.txt);
+
     resetText(e.target.value);
   };
 
+  // Insert task handler
   const handleClick = () => {
     if (data.txt == "") alert("You have to write something!");
     else {
@@ -29,10 +33,12 @@ const Add_Task = () => {
     console.log(data);
   };
 
+  //Reset array of tasks
   const handleClear = () => {
     addTasks([]);
   };
 
+  //delete specific task/s
   const handleDeleteTask = (e) => {
     e.preventDefault();
 
@@ -48,14 +54,13 @@ const Add_Task = () => {
     console.log(tasks);
   };
 
-  // const handleDrag = (e) => {
-  //   const dropid = e.target.id;
-  //   console.log("~~~~~~~~~~          ", dropid);
-  //   e.dataTransfer.setData("dropId", dropid);
-  // };
+  //handle dropping the list item
+  const handleOnDragEnd = (result) => {
+    const items = Array.from(tasks);
+    const [reorderedItem] = items.splice(result.source.index, 1);
+    items.splice(result.destination.index, 0, reorderedItem);
 
-  const handleLastDragged = () => {
-    console.log("LETS GO");
+    addTasks(items);
   };
 
   return (
@@ -69,22 +74,18 @@ const Add_Task = () => {
           Clear Tasks
         </button>
       </div>
+
       <List_Container className="list-container">
         {/* Task Rendering */}
         {tasks.map(
           (task, index) =>
             //handling situation of an empty array
             task.id != null && (
-              <List_Item
-                index={index}
-                id={task.id}
-                text={task.txt}
-                // draggable
-                // onDragStart={handleDrag}
-              />
+              <List_Item index={index} id={task.id} text={task.txt} />
             )
         )}
       </List_Container>
+
       <div id="delete-task">
         <button className="but-delete" onDragOver={handleDeleteTask}>
           <FaTrashAlt style={{ backgroundColor: "transparent" }} /> Delete Task
