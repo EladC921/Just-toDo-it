@@ -3,13 +3,15 @@ import "../css/add_task.css";
 import { useState } from "react";
 import List_Item from "./List_Item";
 import { FaTrashAlt } from "react-icons/fa";
-import styled from "styled-components";
+import { DragDropContext, Draggable, Droppable } from "react-beautiful-dnd";
 
 const Add_Task = () => {
   const [data, setData] = useState({ id: 0, txt: "" });
-  const [tasks, addTasks] = useState([{}]);
+  const [tasks, addTasks] = useState([]);
   const [textS, resetText] = useState();
-  const [lastDragged, setLastDragged] = useState();
+
+  const [checkedTasks, updateCheckedTasks] = useState([]); //in order to know which tasks are checked
+
 
   // text box handler using useState in order to get the users data at all times and to reset the textbox after insert
   const handleUserInput = (e) => {
@@ -24,7 +26,7 @@ const Add_Task = () => {
 
   // Insert task handler
   const handleClick = () => {
-    if (data.txt == "") alert("You have to write something!");
+    if (data.txt === "") alert("You have to write something!");
     else {
       addTasks((arr) => [...arr, data]);
       setData({ id: tasks.length, txt: "" });
@@ -38,35 +40,34 @@ const Add_Task = () => {
     addTasks([]);
   };
 
-  //delete specific task/s
-  const handleDeleteTask = (e) => {
-    e.preventDefault();
+  const handleDragEnd = (result) => {
+    if (!result.destination) return;
 
-    const dropId = e.dataTransfer.getData("dropId");
-    console.log("-----------");
-    console.log(dropId);
-    addTasks(
-      //delete dragged task
-      tasks.filter((task) => {
-        if (task.id != dropId) return task;
-      })
-    );
-    console.log(tasks);
-  };
-
-  //handle dropping the list item
-  const handleOnDragEnd = (result) => {
-    const items = Array.from(tasks);
-    const [reorderedItem] = items.splice(result.source.index, 1);
+    let items = Array.from(tasks);
+    let [reorderedItem] = items.splice(result.source.index, 1);
     items.splice(result.destination.index, 0, reorderedItem);
 
     addTasks(items);
-  };
+  }
+
+  const handleDeleteTask = (e) => {
+    console.log(checkedTasks);
+    let data = tasks.filter(task => {
+      console.log(checkedTasks.includes(task.id));
+      return !checkedTasks.includes(task.id)
+    });
+    addTasks(data);
+    console.log(data);
+    updateCheckedTasks([]);
+  }
+
+
 
   return (
     <div className="container">
+      {/* Add and clear tasks container */}
       <div id="search">
-        <input onChange={handleUserInput} type="text" value={textS}></input>
+        <textarea onChange={handleUserInput} type="text" value={textS}></textarea>
         <button id="but-add-task" onClick={handleClick}>
           Add Task
         </button>
@@ -75,26 +76,58 @@ const Add_Task = () => {
         </button>
       </div>
 
-      <List_Container className="list-container">
-        {/* Task Rendering */}
-        {tasks.map(
-          (task, index) =>
-            //handling situation of an empty array
-            task.id != null && (
-              <List_Item index={index} id={task.id} text={task.txt} />
-            )
-        )}
-      </List_Container>
+      {/* Tasks container with DND */}
+      <DragDropContext onDragEnd={handleDragEnd}>
+        <Droppable droppableId="droppable">
+          {(provided) =>
+            <div className="list-container"
+              {...provided.droppableProps}
+              ref={provided.innerRef}
+            >
+              {/* Task Rendering */}
+              {tasks.map(
+                (task, index) => {
+                  //handling situation of an empty array
+                  return (
+                    <Draggable key={task.id.toString()} index={index} draggableId={task.id.toString()} >
+                      {(provided) =>
+                        <div ref={provided.innerRef}
+                          {...provided.draggableProps}
+                          {...provided.dragHandleProps}>
+                          {/* List Item Component rendering for each toDo */}
+                          <List_Item text={task.txt}
+                            id={task.id}
+                            index={index}
+                            tasks={tasks}
+                            editTasks={addTasks}
+                            updateChecked={updateCheckedTasks}
+                            checkedTasks={checkedTasks}
+                          />
+                        </div>
+                      }
+                    </Draggable>
+                  )
+                })}
+              {provided.placeholder}
+            </div>
+          }
+        </Droppable>
+      </DragDropContext>
 
+      {/* Delete tasks container */}
       <div id="delete-task">
-        <button className="but-delete" onDragOver={handleDeleteTask}>
-          <FaTrashAlt style={{ backgroundColor: "transparent" }} /> Delete Task
+        <button className="but-delete" onClick={handleDeleteTask}>
+          <FaTrashAlt style={{ backgroundColor: "transparent" }} /> Delete Tasks
         </button>
+
       </div>
-    </div>
+
+
+
+    </div >
+
   );
 };
 
-const List_Container = styled.div``;
 
 export default Add_Task;

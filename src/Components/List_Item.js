@@ -1,49 +1,74 @@
 import React from "react";
 import styled from "styled-components";
-import { useRef, useState } from "react";
+import { useRef, useState, useEffect } from "react";
 import "../css/list-item.css";
 import { VscListFlat } from "react-icons/vsc";
 import { FaRegEdit } from "react-icons/fa";
+import { FcCheckmark } from "react-icons/fc"
 
 const List_Item = (props) => {
   const item = useRef();
   const text = props.text;
-  const i = props.index;
   const [itemState, setItemState] = useState();
+  const [edit, setEdit] = useState(false);
+  const [textS, setTextS] = useState(text);
 
-  const handleCheckDiv = () => {
+  let data = (props.checkedTasks && props.checkedTasks.length > 0) ? [...props.checkedTasks, props.id] : [props.id];
+
+  //handle clicking on the div the check the checkbox
+  const handleCheckDiv = (e) => {
     item.current.checked = item.current.checked ? false : true;
     handleCheck();
   };
 
+  //handdle checkbox checking
   const handleCheck = () => {
-    item.current.checked
-      ? setItemState({ textDecoration: "line-through" })
-      : setItemState({ textDecoration: "initial" });
+    console.log("checked Tasks:");
+    console.log(data);
+
+    if (item.current.checked) {
+      props.updateChecked(data);
+      setItemState({ textDecoration: "line-through" })
+    }
+
+    else {
+      data = data.filter(id => id !== props.id);
+      props.updateChecked(data);
+
+      setItemState({ textDecoration: "initial" });
+    }
   };
 
-  const handleDrag = (e) => {
-    console.log("~~~~~~~~~~~");
-    console.log(props.id);
-    e.dataTransfer.setData("dropId", props.id);
-    // props.handleLastDragged(props.id); //save the current task being dragged
-  };
+  //handle edit task
+  const handleEdit = () => {
+    setEdit(true);
+  }
+
+  const handleEditText = (e) => {
+    setTextS(e.target.value);
+  }
+
+  const acceptEdit = () => {
+    // let updatedTasks = props.tasks.map(task => {
+    //   if (props.id === task.id) task.text = textS;
+    // })
+    // props.editTasks(updatedTasks);
+  }
 
   return (
     <List_Item_style
       className="list-item-container"
-      draggable
-      onDragStart={handleDrag}
       key={props.id}
     >
       <Checkbox>
         <input onChange={handleCheck} ref={item} type="checkbox" />
       </Checkbox>
       <Text onClick={handleCheckDiv} style={itemState}>
-        {text}
+        {(edit) ? <><textarea type="text" onChange={handleEditText} value={textS} /><FcCheckmark onClick={acceptEdit} /></> : text}
+
       </Text>
       <Icons>
-        <FaRegEdit className="edit-icon" />
+        <FaRegEdit className="edit-icon" onClick={handleEdit} />
         <VscListFlat className="drag-icon" />
       </Icons>
     </List_Item_style>
@@ -59,12 +84,12 @@ const List_Item_style = styled.div`
   grid-template-columns: 10% 80% 5% 5%;
 
   &:hover {
-    transform: translate(0, -5px);
+    /* transform: translate(0, -5px); */
     background-color: #aaaaaa;
   }
 
   &:active {
-    background-color: #727171;
+    background-color: #f42e2e;
   }
 `;
 
