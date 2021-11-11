@@ -44,16 +44,24 @@ const List_Item = (props) => {
     setEdit(true);
   }
 
+  //altering local state in order to be able to edit the text
   const handleEditText = (e) => {
     setTextS(e.target.value);
   }
 
+  //edit task - press accept
   const acceptEdit = () => {
-    // let updatedTasks = props.tasks.map(task => {
-    //   if (props.id === task.id) task.text = textS;
-    // })
-    // props.editTasks(updatedTasks);
+    let updatedTasks = props.tasks;
+    updatedTasks.map(task => {
+      console.log("checkpoint")
+      if (props.id === task.id) task.text = textS;
+      console.log("TASK TEXT:")
+      console.log(task.text);
+    })
+    props.editTasks(updatedTasks);
+    setEdit(false);
   }
+
 
   return (
     <List_Item_style
@@ -64,7 +72,7 @@ const List_Item = (props) => {
         <input onChange={handleCheck} ref={item} type="checkbox" />
       </Checkbox>
       <Text onClick={handleCheckDiv} style={itemState}>
-        {(edit) ? <><textarea type="text" onChange={handleEditText} value={textS} /><FcCheckmark onClick={acceptEdit} /></> : text}
+        {(edit) ? <><textarea type="text" onChange={handleEditText} value={textS} /><FcCheckmark onClick={acceptEdit} /></> : textS}
 
       </Text>
       <Icons>

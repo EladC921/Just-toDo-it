@@ -40,6 +40,7 @@ const Add_Task = () => {
     addTasks([]);
   };
 
+  //reorder list after dragging
   const handleDragEnd = (result) => {
     if (!result.destination) return;
 
@@ -50,6 +51,7 @@ const Add_Task = () => {
     addTasks(items);
   }
 
+  //Delete hecked tasks
   const handleDeleteTask = (e) => {
     console.log(checkedTasks);
     let data = tasks.filter(task => {
@@ -61,13 +63,16 @@ const Add_Task = () => {
     updateCheckedTasks([]);
   }
 
-
+  const handleKeyDown = (e) => {
+    if (e.key === 'Enter' && e.shiftKey) return;
+    else if (e.key === 'Enter') handleClick();
+  }
 
   return (
     <div className="container">
       {/* Add and clear tasks container */}
       <div id="search">
-        <textarea onChange={handleUserInput} type="text" value={textS}></textarea>
+        <textarea onChange={handleUserInput} type="text" value={textS} tabIndex="0" onKeyDown={handleKeyDown}></textarea>
         <button id="but-add-task" onClick={handleClick}>
           Add Task
         </button>
